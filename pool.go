@@ -91,7 +91,11 @@ func (p *pool) cap() int {
 }
 
 func (p *pool) contains(item *sequenceInfo) bool {
-	value, _ := p.distinctItems.Load(item.genes)
+	value, ok := p.distinctItems.Load(item.genes)
+	if !ok {
+		return false
+	}
+
 	return value.(bool)
 }
 

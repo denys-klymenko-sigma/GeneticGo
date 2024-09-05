@@ -1,11 +1,12 @@
 package genetic
 
 import (
-	rnd "github.com/handcraftsman/Random"
 	"math/rand"
 	"runtime"
 	s "sort"
 	"time"
+
+	rnd "github.com/handcraftsman/Random"
 )
 
 func createRandomNumberGenerator() randomSource {

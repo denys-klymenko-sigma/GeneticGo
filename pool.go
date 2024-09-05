@@ -1,9 +1,13 @@
 package genetic
 
+import (
+	"sync"
+)
+
 type pool struct {
 	random                randomSource
 	items                 []*sequenceInfo
-	distinctItems         map[string]bool
+	distinctItems         *sync.Map
 	distinctItemFitnesses map[int]bool
 	addNewItem            chan *sequenceInfo
 
@@ -14,16 +18,15 @@ func NewPool(maxPoolSize int,
 	quit chan bool,
 	childFitnessIsSameOrBetter func(*sequenceInfo, *sequenceInfo) bool,
 	display chan *sequenceInfo) *pool {
-	p := pool{
+	var p = pool{
 		maxPoolSize: maxPoolSize,
 
 		random:                createRandomNumberGenerator(),
 		items:                 make([]*sequenceInfo, 0, maxPoolSize),
-		distinctItems:         make(map[string]bool, maxPoolSize),
+		distinctItems:         &sync.Map{},
 		distinctItemFitnesses: make(map[int]bool, maxPoolSize),
 		addNewItem:            make(chan *sequenceInfo, maxPoolSize),
 	}
-
 	go func() {
 		for {
 			select {
@@ -31,10 +34,10 @@ func NewPool(maxPoolSize int,
 				quit <- true
 				return
 			case newItem := <-p.addNewItem:
-				if p.distinctItems[newItem.genes] {
+				if value, ok := p.distinctItems.Load(newItem.genes); ok && value.(bool) {
 					continue
 				}
-				p.distinctItems[newItem.genes] = true
+				p.distinctItems.Store(newItem.genes, true)
 
 				if len(p.items) < 1 {
 					p.items = append(p.items, newItem)
@@ -88,7 +91,8 @@ func (p *pool) cap() int {
 }
 
 func (p *pool) contains(item *sequenceInfo) bool {
-	return p.distinctItems[item.genes]
+	value, _ := p.distinctItems.Load(item.genes)
+	return value.(bool)
 }
 
 func (p *pool) getBest() *sequenceInfo {
@@ -115,14 +119,13 @@ func (p *pool) len() int {
 	return len(p.items)
 }
 
-func (p *pool) populatePool(nextChromosome chan string, geneSet string, numberOfChromosomes, numberOfGenesPerChromosome int, compareFitnesses func(*sequenceInfo, *sequenceInfo) bool, getFitness func(string) int, initialParent *sequenceInfo) {
+func (p *pool) populatePool(nextChromosome chan string, geneSet string, numberOfChromosomes, numberOfGenesPerChromosome int, getFitness func(string) int, initialParent *sequenceInfo) {
 
 	itemGenes := generateParent(nextChromosome, geneSet, numberOfChromosomes, numberOfGenesPerChromosome)
 	initialStrategy := strategyInfo{name: "initial   "}
 	p.addItem(initialParent)
 
-	max := p.cap()
-	for i := 0; i < 2*max; i++ {
+	for i := 0; i < 2*p.cap(); i++ {
 		itemGenes = generateParent(nextChromosome, geneSet, numberOfChromosomes, numberOfGenesPerChromosome)
 		sequence := sequenceInfo{genes: itemGenes, fitness: getFitness(itemGenes), strategy: initialStrategy}
 		sequence.parent = &sequence
@@ -137,11 +140,11 @@ func (p *pool) reset(item *sequenceInfo) {
 }
 
 func (p *pool) resetDistinct() {
-	p.distinctItems = make(map[string]bool, p.maxPoolSize)
+	p.distinctItems = &sync.Map{}
 	p.distinctItemFitnesses = make(map[int]bool, p.maxPoolSize)
 
 	for i := 0; i < len(p.items); i++ {
-		p.distinctItems[p.items[i].genes] = true
+		p.distinctItems.Store(p.items[i].genes, true)
 		p.distinctItemFitnesses[p.items[i].fitness] = true
 	}
 }

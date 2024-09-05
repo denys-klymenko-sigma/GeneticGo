@@ -6,12 +6,12 @@ This genetic solver adaptively adjusts the strategies being used to those that a
 
 GeneticGo is compatible with Go 1. Add it to your package repository:
 
-	go get "github.com/handcraftsman/Random"
-	go get "github.com/handcraftsman/GeneticGo"
+	go get "github.com/denys-klymenko-sigma/Random"
+	go get "github.com/denys-klymenko-sigma/GeneticGo"
 
 then use it in your program:
 
-	import "github.com/handcraftsman/GeneticGo"
+	import "github.com/denys-klymenko-sigma/GeneticGo"
 
 	solver := new(genetic.Solver)
 	solver.MaxSecondsToRunWithoutImprovement = 20 // you decide
@@ -67,7 +67,7 @@ alternatively, if you want the gene sequence to grow as necessary:
 
 	go run samples/tsp/tsp.go samples/tsp/data/eil51.tsp
 
-	prerequisite: go get "github.com/handcraftsman/File"
+	prerequisite: go get "github.com/denys-klymenko-sigma/File"
 
 - regex.go - genetically builds a regular expression. See [related blog post](http://handcraftsman.wordpress.com/2012/04/11/evolving-a-regular-expression-with-go/)
 
@@ -79,13 +79,13 @@ alternatively, if you want the gene sequence to grow as necessary:
 
 	go run samples/ukp/standard/standard.go samples/ukp/data/exnsd16.ukp
 	
-	prerequisite: go get "github.com/handcraftsman/File"
+	prerequisite: go get "github.com/denys-klymenko-sigma/File"
 
 - lawnmower problem solver. See  [related blog post](http://handcraftsman.wordpress.com/2012/04/29/lawnmower-problem-solver/)
 
     go run samples/lawnmower/*.go
 	
-	prerequisite: go get "github.com/handcraftsman/Interpreter"
+	prerequisite: go get "github.com/denys-klymenko-sigma/Interpreter"
 	
 ## License		
 

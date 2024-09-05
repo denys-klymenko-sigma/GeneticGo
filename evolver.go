@@ -323,7 +323,7 @@ func (evolver *evolver) initializePool(numberOfChromosomes int, display chan *se
 		evolver.initialParent.parent = &evolver.initialParent
 	}
 
-	evolver.pool.populatePool(evolver.nextChromosome, evolver.geneSet, numberOfChromosomes, evolver.numberOfGenesPerChromosome, evolver.childFitnessIsBetter, evolver.getFitness, &evolver.initialParent)
+	evolver.pool.populatePool(evolver.nextChromosome, evolver.geneSet, numberOfChromosomes, evolver.numberOfGenesPerChromosome, evolver.getFitness, &evolver.initialParent)
 
 	evolver.numberOfImprovements = 1
 	evolver.randomParent = make(chan *sequenceInfo, 10)
